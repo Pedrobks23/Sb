@@ -1,0 +1,185 @@
+.confirmacao-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.confirmacao-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+h1 {
+  background-color: #FFC107;
+  color: #000;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  margin: -30px -30px 20px -30px;
+}
+
+.instructions {
+  margin: 20px 0;
+  color: #333;
+  text-align: center;
+}
+
+.site-url {
+  color: #666;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.codigo-box {
+  background-color: #fff;
+  border: 2px solid #FFC107;
+  border-radius: 15px;
+  padding: 15px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.codigo-box p {
+  margin: 0;
+  color: #333;
+}
+
+.codigo-box strong {
+  display: block;
+  font-size: 24px;
+  color: #000;
+  margin-top: 5px;
+}
+
+.message-box {
+  background-color: #E3F2FD;
+  border: 2px solid #2196F3;
+  border-radius: 15px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.prazo-info {
+  color: #1976D2;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.instrucoes {
+  margin: 20px 0;
+}
+
+.destaque {
+  color: #D32F2F;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.qr-code-container {
+  margin: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.qr-code {
+  padding: 15px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.download-button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.download-button:hover {
+  background-color: #1976D2;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  gap: 10px;
+}
+
+.pdf-button, .finish-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  flex: 1;
+}
+
+.pdf-button {
+  background-color: #fff;
+  color: #333;
+  border: 2px solid #FFC107;
+}
+
+.finish-button {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.pdf-button:hover {
+  background-color: #FFC107;
+}
+
+.finish-button:hover {
+  background-color: #45a049;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-weight: bold;
+}
+
+.error-message {
+  text-align: center;
+  color: #D32F2F;
+  padding: 20px;
+  font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  .confirmacao-content {
+      padding: 20px;
+  }
+
+  h1 {
+      margin: -20px -20px 15px -20px;
+      font-size: 20px;
+  }
+
+  .buttons-container {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .pdf-button, .finish-button {
+      width: 100%;
+  }
+}
