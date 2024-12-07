@@ -47,7 +47,6 @@
     "workbox-strategies": "^6.6.0",
     "workbox-streams": "^6.6.0"
   },
-<<<<<<< HEAD
   "scripts": {
   "start": "react-scripts start",
   "build": "react-scripts build",
@@ -58,14 +57,6 @@
   "electron:build": "npm run build && electron-builder",
   "electron:test": "cross-env NODE_ENV=production electron ." 
 },
-=======
-    "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
->>>>>>> e1a70b1 (Falta só ajuste da logo após recarregar)
   "build": {
     "appId": "com.sportbike.app",
     "productName": "Sport & Bike",
