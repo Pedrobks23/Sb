@@ -43,83 +43,128 @@ const Confirmacao = () => {
     loadOrderData();
   }, [orderId, location.state, navigate]);
 
+
   const generatePDF = async () => {
     try {
-      const pdf = new jsPDF();
-      
-      // Configuração do documento
-      pdf.setFontSize(16);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Sport & Bike - Ordem de Serviço", 105, 20, { align: "center" });
-      
-      // Informações da ordem
-      pdf.setFontSize(12);
-      pdf.setFont("helvetica", "bold");
-      pdf.text(`Ordem de Serviço: ${orderData.codigo}`, 20, 40);
-      pdf.text(`Data Agendada: ${new Date(orderData.dataAgendamento).toLocaleDateString()}`, 20, 50);
-      
-      // Nota sobre prazo
-      pdf.setFont("helvetica", "italic");
-      pdf.setFontSize(10);
-      pdf.text("Nota: Para garantir a melhor qualidade do serviço, a revisão pode ser finalizada", 20, 60);
-      pdf.text("em até 2 dias após a data agendada. Agradecemos sua compreensão!", 20, 65);
-      
-      // Dados do cliente
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(12);
-      pdf.text("Dados do Cliente:", 20, 80);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`Nome: ${orderData.cliente.nome}`, 20, 90);
-      pdf.text(`Telefone: ${orderData.cliente.telefone}`, 20, 100);
-      if (orderData.cliente.endereco) {
-        pdf.text(`Endereço: ${orderData.cliente.endereco}`, 20, 110);
-      }
-      
-      // Bicicletas e Serviços
-      let yPos = 130;
-      pdf.setFont("helvetica", "bold");
-      pdf.text("Bicicletas e Serviços:", 20, yPos);
-      yPos += 10;
-
-      orderData.bicicletas.forEach((bike, index) => {
-        // Verifica se precisa adicionar nova página
-        if (yPos > 250) {
-          pdf.addPage();
-          yPos = 20;
-        }
-
-        pdf.setFont("helvetica", "bold");
-        pdf.text(`${bike.marca} - ${bike.modelo} - ${bike.cor}`, 20, yPos);
-        yPos += 10;
-
-        pdf.setFont("helvetica", "normal");
-        Object.entries(bike.services)
-          .filter(([_, quantity]) => quantity > 0)
-          .forEach(([service, quantity]) => {
-            pdf.text(`• ${service}${quantity > 1 ? ` (x${quantity})` : ''}`, 30, yPos);
-            yPos += 7;
-          });
-
-        if (bike.observacoes) {
-          pdf.text(`Observações: ${bike.observacoes}`, 30, yPos);
-          yPos += 7;
-        }
-
-        pdf.text(`Total: R$ ${bike.total.toFixed(2)}`, 30, yPos);
-        yPos += 15;
+      const pdf = new jsPDF({
+        format: 'a4',
+        unit: 'mm'
       });
 
-      // Valor Total
-      pdf.setFont("helvetica", "bold");
-      pdf.text(`Valor Total: R$ ${orderData.valorTotal.toFixed(2)}`, 20, yPos + 10);
+      const addVia = async (startY) => {
+        // Logo - ajustando proporção
+        const logoWidth = 25;
+        const logoHeight = 25;
+        const logoPath = require('./assets/Logo.png');
+        pdf.addImage(logoPath, 'PNG', 10, startY, logoWidth, logoHeight);
 
-      // QR Code
-      const qrCodeElement = document.getElementById('qr-code');
-      if (qrCodeElement) {
-        const canvas = await html2canvas(qrCodeElement);
-        const qrCodeImage = canvas.toDataURL('image/png');
-        pdf.addImage(qrCodeImage, 'PNG', 130, yPos - 40, 60, 60);
-      }
+        // Cabeçalho
+        pdf.setFontSize(16);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("ORDEM DE SERVIÇO", 105, startY + 15, { align: "center" });
+        
+        // Informações da empresa
+        pdf.setFontSize(8);
+        pdf.setFont("helvetica", "normal");
+        pdf.text("Rua Ana Bilhar, 1680 - Varjota, Fortaleza - CE", 105, startY + 22, { align: "center" });
+        pdf.text("Tel: (85) 3267-7425 | (85) 3122-5874 | WhatsApp: (85) 3267-7425", 105, startY + 26, { align: "center" });
+        pdf.text("@sportbike_fortaleza | comercialsportbike@gmail.com", 105, startY + 30, { align: "center" });
+
+        // Número da OS e Datas
+        pdf.setFontSize(12);
+        pdf.setFont("helvetica", "bold");
+        const numeroY = startY + 38; // Ajustado pois removemos uma linha
+        pdf.text(`OS: ${orderData.codigo}`, 10, numeroY);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(`Criada em: ${new Date(orderData.dataCriacao).toLocaleDateString()}`, 10, numeroY + 5);
+        pdf.text(`Agendada para: ${new Date(orderData.dataAgendamento).toLocaleDateString()}`, 10, numeroY + 10);
+
+        // Dados do Cliente
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");
+        const clienteY = numeroY + 20;
+        pdf.text("DADOS DO CLIENTE", 10, clienteY);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(`Nome: ${orderData.cliente.nome}`, 10, clienteY + 5);
+        pdf.text(`Telefone: ${orderData.cliente.telefone}`, 10, clienteY + 10);
+        if (orderData.cliente.endereco) {
+          pdf.text(`Endereço: ${orderData.cliente.endereco}`, 10, clienteY + 15);
+        }
+
+        // Bicicletas e Serviços
+        let currentY = clienteY + (orderData.cliente.endereco ? 25 : 20);
+
+        orderData.bicicletas.forEach((bike, index) => {
+          pdf.setFont("helvetica", "bold");
+          pdf.text(`BICICLETA ${index + 1}: ${bike.marca} - ${bike.modelo} - ${bike.cor}`, 10, currentY);
+          currentY += 5;
+
+          // Cabeçalho da tabela
+          pdf.setFontSize(8);
+          pdf.text("Serviço", 10, currentY + 3);
+          pdf.text("Qtd", 100, currentY + 3);
+          pdf.text("Valor", 120, currentY + 3);
+          currentY += 5;
+
+          // Linhas da tabela
+          pdf.setFont("helvetica", "normal");
+          Object.entries(bike.services)
+            .filter(([_, quantity]) => quantity > 0)
+            .forEach(([service, quantity]) => {
+              pdf.text(`• ${service}`, 10, currentY + 3);
+              pdf.text(`${quantity}`, 102, currentY + 3);
+              const valor = (orderData.valorTotal / Object.keys(bike.services).length).toFixed(2);
+              pdf.text(`R$ ${valor}`, 120, currentY + 3);
+              currentY += 4;
+            });
+
+          if (bike.observacoes) {
+            currentY += 2;
+            pdf.setFont("helvetica", "italic");
+            pdf.text(`Obs: ${bike.observacoes}`, 10, currentY + 3);
+            currentY += 4;
+          }
+
+          pdf.setFont("helvetica", "bold");
+          pdf.text(`Total: R$ ${bike.total.toFixed(2)}`, 120, currentY + 3);
+          currentY += 8;
+        });
+
+        // Total Geral
+        pdf.setFontSize(12);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`TOTAL GERAL: R$ ${orderData.valorTotal.toFixed(2)}`, 105, currentY + 3, { align: "right" });
+        
+        // Informações Adicionais
+        currentY += 10;
+        pdf.setFontSize(8);
+        pdf.setFont("helvetica", "normal");
+        pdf.text("• O prazo para conclusão do serviço pode ser estendido em até 2 dias após a data agendada.", 10, currentY);
+        currentY += 4;
+        pdf.text("• Caso a bicicleta ou peças não sejam retiradas no prazo de 180 dias após o término", 10, currentY);
+        currentY += 4;
+        pdf.text("  do serviço, serão vendidas para custear as despesas.", 10, currentY);
+
+        // QR Code
+        try {
+          const qrCodeElement = document.getElementById('qr-code');
+          if (qrCodeElement) {
+            const canvas = await html2canvas(qrCodeElement);
+            const qrCodeImage = canvas.toDataURL('image/png');
+            pdf.addImage(qrCodeImage, 'PNG', 140, currentY - 25, 25, 25);
+          }
+        } catch (error) {
+          console.error('Erro ao gerar QR Code:', error);
+        }
+
+        // Linha divisória entre as vias
+        pdf.setDrawColor(200);
+        pdf.line(0, 148.5, 210, 148.5);
+      };
+
+      // Adiciona as duas vias
+      await addVia(10); // Primeira via
+      await addVia(158.5); // Segunda via (148.5 + 10mm de margem)
 
       pdf.save(`OS-${orderData.codigo}.pdf`);
 
@@ -176,7 +221,7 @@ const Confirmacao = () => {
         </div>
 
         <div className="message-box">
-          <p>Sua revisão está agendada para: {new Date(orderData.dataAgendamento).toLocaleDateString()}</p>
+          <p>Seu serviço está agendado para: {new Date(orderData.dataAgendamento).toLocaleDateString()}</p>
           <p className="prazo-info">Para garantir a melhor qualidade do serviço, em casos excepcionais, 
           a revisão pode ser finalizada em até 2 dias após a data agendada. 
           Faremos o possível para entregar no prazo!</p>

@@ -35,6 +35,26 @@ const OrdemServico = () => {
   });
   const [availableServices, setAvailableServices] = useState(null);
 
+  const validateDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDay = new Date(date);
+    selectedDay.setHours(0, 0, 0, 0);
+    return selectedDay >= today; // Agora inclui o dia atual
+  };
+
+  const handleDateChange = (e) => {
+    const newDate = e.target.value;
+    if (validateDate(newDate)) {
+      setSelectedDate(newDate);
+    } else {
+      alert('Selecione uma data futura');
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
+      e.target.value = today;
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -170,8 +190,7 @@ const OrdemServico = () => {
           ...clienteData,
           telefone
         },
-        // Ajustar a data para manter o dia selecionado
-        dataAgendamento: new Date(selectedDate + 'T12:00:00').toISOString(), // Adiciona meio-dia no fuso local
+        dataAgendamento: new Date(selectedDate + 'T12:00:00').toISOString(),
         dataCriacao: new Date().toISOString(),
         dataAtualizacao: new Date().toISOString(),
         status: 'Pendente',
@@ -204,7 +223,6 @@ const OrdemServico = () => {
 
       await batch.commit();
 
-      // Primeiro navegar
       await navigate(`/confirmacao/${docRef.id}`, { 
         state: { 
           codigoOS,
@@ -215,7 +233,6 @@ const OrdemServico = () => {
         replace: true
       });
 
-      // Depois limpar o localStorage
       localStorage.removeItem('selectedBikes');
       localStorage.removeItem('selectedServices');
 
@@ -343,7 +360,8 @@ const OrdemServico = () => {
                 type="date"
                 id="data"
                 value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                onChange={handleDateChange}
+                onKeyDown={(e) => e.preventDefault()}
                 min={new Date().toISOString().split('T')[0]}
                 required
               />

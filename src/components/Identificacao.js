@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase/firebase'; // Ajuste o caminho corretamente
+import { db } from '../firebase/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom'; // Importando o hook de navegação
+import { useNavigate } from 'react-router-dom';
 import '../styles/identificacao.css';
-import '../styles/shared.css'; // Estilo para a tela de seleção e cadastro de bikes
+import '../styles/shared.css';
 
 const Identificacao = () => {
   const [telefone, setTelefone] = useState('');
   const [nome, setNome] = useState('');
   const [endereco, setEndereco] = useState('');
-  const [clientData, setClientData] = useState(null); // Armazena os dados do cliente para edição
+  const [clientData, setClientData] = useState(null);
+  const [errors, setErrors] = useState({});
 
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
 
-  // Função para carregar os dados do cliente a partir do telefone
   useEffect(() => {
     const loadClientData = async () => {
-      if (!telefone) return; // Não faz nada se o telefone estiver vazio
+      if (!telefone) {
+        setNome('');
+        setEndereco('');
+        setClientData(null);
+        return;
+      }
 
       const docRef = doc(db, 'clientes', telefone);
       const docSnap = await getDoc(docRef);
@@ -24,31 +29,54 @@ const Identificacao = () => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setNome(data.nome);
-        setEndereco(data.endereco || ''); // Se não houver endereço, coloca vazio
-        setClientData(data); // Armazena os dados do cliente para edição
+        setEndereco(data.endereco || '');
+        setClientData(data);
       } else {
-        setClientData(null); // Cliente não encontrado
+        setNome('');
+        setEndereco('');
+        setClientData(null);
       }
     };
 
-    loadClientData(); // Carrega os dados sempre que o telefone for alterado
+    loadClientData();
   }, [telefone]);
 
-  // Função para atualizar ou adicionar os dados do cliente
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!telefone) {
+      newErrors.telefone = 'Digite o telefone';
+    } else if (telefone.length < 8) {
+      newErrors.telefone = 'Telefone inválido';
+    }
+
+    setErrors(newErrors);
+
+    // Validação do nome com alert
+    if (!nome.trim()) {
+      alert('Digite o nome do cliente');
+      return false;
+    }
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      return;
+    }
+
     const clientRef = doc(db, 'clientes', telefone);
     if (clientData) {
-      // Atualiza os dados se o cliente já existir
       await setDoc(clientRef, {
         nome,
         telefone,
         endereco,
-      }, { merge: true }); // `merge: true` mantém os dados existentes e atualiza os novos
+      }, { merge: true });
       console.log("Dados atualizados no banco!");
     } else {
-      // Caso o cliente não exista, cria um novo
       await setDoc(clientRef, {
         nome,
         telefone,
@@ -57,39 +85,44 @@ const Identificacao = () => {
       console.log("Cliente adicionado no banco!");
     }
 
-    // Redireciona para a tela de seleção de bikes após salvar os dados
-    navigate(`/bike-selection/${telefone}`); // Passando o telefone para a tela de BikeSelection
+    navigate(`/bike-selection/${telefone}`);
   };
 
-  // Função para voltar para a tela anterior
   const handleBack = () => {
-    navigate('/'); // Navega de volta para a tela inicial
+    navigate('/');
   };
 
-  // Função para garantir que o telefone seja apenas numérico
   const handlePhoneChange = (e) => {
-    // Substitui qualquer caractere não numérico por vazio
-    setTelefone(e.target.value.replace(/[^0-9]/g, ''));
+    const value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length <= 12) {
+      setTelefone(value);
+    }
+  };
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= 30) {
+      setNome(value);
+    }
   };
 
   return (
     <div className="identificacao-container">
-      {/* Exibindo as mensagens de status do cliente */}
       {telefone && clientData ? (
         <p>Cliente encontrado</p>
       ) : telefone ? (
         <p>Cliente não encontrado, preencha os dados abaixo</p>
       ) : null}
 
-      {/* Formulário de Identificação */}
       <div className="input-group">
         <input
           type="text"
-          placeholder="Telefone"
+          placeholder="Telefone *"
           value={telefone}
-          onChange={handlePhoneChange} // Alteração para garantir apenas números
-          maxLength="11" // Limita a 11 caracteres
+          onChange={handlePhoneChange}
+          maxLength="12"
         />
+        {errors.telefone && <span className="error-message">{errors.telefone}</span>}
       </div>
 
       {clientData ? (
@@ -97,9 +130,10 @@ const Identificacao = () => {
           <div className="input-group">
             <input
               type="text"
-              placeholder="Nome"
+              placeholder="Nome *"
               value={nome}
-              onChange={(e) => setNome(e.target.value)}
+              onChange={handleNameChange}
+              maxLength="30"
             />
           </div>
           <div className="input-group">
@@ -117,9 +151,10 @@ const Identificacao = () => {
             <div className="input-group">
               <input
                 type="text"
-                placeholder="Nome"
+                placeholder="Nome *"
                 value={nome}
-                onChange={(e) => setNome(e.target.value)}
+                onChange={handleNameChange}
+                maxLength="30"
               />
             </div>
             <div className="input-group">
@@ -134,14 +169,10 @@ const Identificacao = () => {
         )
       )}
 
-      {/* Container para os botões */}
       <div className="btn-container">
-        {/* Botão Voltar */}
         <button className="btn" onClick={handleBack}>
           Voltar
         </button>
-
-        {/* Botão Continuar */}
         <button className="btn" onClick={handleSubmit}>
           Continuar
         </button>

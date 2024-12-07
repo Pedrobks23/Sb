@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/home';
@@ -6,7 +5,7 @@ import Identificacao from './components/Identificacao';
 import BikeSelection from './components/BikeSelection';
 import Servicos from './components/servicos';
 import OrdemServico from './components/OrdemServico';
-import Confirmacao from './components/Confirmacao'; // Comentado até criar o componente
+import Confirmacao from './components/Confirmacao';
 
 function App() {
   return (

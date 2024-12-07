@@ -26,8 +26,9 @@ const SERVICE_ORDER = [
 const MULTIPLE_SERVICES = [
   'Sangria de freio (cada freio)', 
   'Serviço de raios (cada roda)', 
-  'Camara de ar 29', 
-  'Camara de ar 12 a 26'
+  'Câmara de ar 29', 
+  'Câmara de ar 12 a 26',
+  'Câmara de ar 700'
 ];
 
 const Servicos = () => {
@@ -248,7 +249,7 @@ const Servicos = () => {
   };
 
   return (
-    <>
+    <div className="page-container">
       <button onClick={handleBack} className="back-button">
         Voltar
       </button>
@@ -375,7 +376,7 @@ const Servicos = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
