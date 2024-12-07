@@ -1,16 +1,13 @@
 {
   "name": "sb",
-<<<<<<< HEAD
   "version": "0.1.0",
   "main": "electron/main.js",  
   "private": true,
   "description": "Sistema de Gerenciamento Sport & Bike",
-=======
   "version": "0.1.0-beta",
   "main": "./electron/main.js",
   "homepage": "./",
   "description": "Sistema de Gestão Sport & Bike - Versão Beta",
->>>>>>> e1a70b1 (Falta só ajuste da logo após recarregar)
   "author": {
     "name": "Sport & Bike",
     "email": "seu-email@exemplo.com"
