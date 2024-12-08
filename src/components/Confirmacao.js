@@ -43,7 +43,6 @@ const Confirmacao = () => {
     loadOrderData();
   }, [orderId, location.state, navigate]);
 
-
   const generatePDF = async () => {
     try {
       const pdf = new jsPDF({
@@ -52,11 +51,10 @@ const Confirmacao = () => {
       });
 
       const addVia = async (startY) => {
-        // Logo - ajustando proporção
+        // Logo
         const logoWidth = 25;
         const logoHeight = 25;
-        const logoPath = require('./assets/Logo.png');
-        pdf.addImage(logoPath, 'PNG', 10, startY, logoWidth, logoHeight);
+        pdf.addImage('/Logo.png', 'PNG', 10, startY, logoWidth, logoHeight);
 
         // Cabeçalho
         pdf.setFontSize(16);
@@ -73,7 +71,7 @@ const Confirmacao = () => {
         // Número da OS e Datas
         pdf.setFontSize(12);
         pdf.setFont("helvetica", "bold");
-        const numeroY = startY + 38; // Ajustado pois removemos uma linha
+        const numeroY = startY + 38;
         pdf.text(`OS: ${orderData.codigo}`, 10, numeroY);
         pdf.setFont("helvetica", "normal");
         pdf.text(`Criada em: ${new Date(orderData.dataCriacao).toLocaleDateString()}`, 10, numeroY + 5);
@@ -113,8 +111,8 @@ const Confirmacao = () => {
             .forEach(([service, quantity]) => {
               pdf.text(`• ${service}`, 10, currentY + 3);
               pdf.text(`${quantity}`, 102, currentY + 3);
-              const valor = (orderData.valorTotal / Object.keys(bike.services).length).toFixed(2);
-              pdf.text(`R$ ${valor}`, 120, currentY + 3);
+              const valor = bike.total / Object.values(bike.services).filter(q => q > 0).length;
+              pdf.text(`R$ ${valor.toFixed(2)}`, 120, currentY + 3);
               currentY += 4;
             });
 
@@ -162,9 +160,8 @@ const Confirmacao = () => {
         pdf.line(0, 148.5, 210, 148.5);
       };
 
-      // Adiciona as duas vias
-      await addVia(10); // Primeira via
-      await addVia(158.5); // Segunda via (148.5 + 10mm de margem)
+      await addVia(10);
+      await addVia(158.5);
 
       pdf.save(`OS-${orderData.codigo}.pdf`);
 

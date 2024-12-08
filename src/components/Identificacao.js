@@ -6,179 +6,174 @@ import '../styles/identificacao.css';
 import '../styles/shared.css';
 
 const Identificacao = () => {
-  const [telefone, setTelefone] = useState('');
-  const [nome, setNome] = useState('');
-  const [endereco, setEndereco] = useState('');
-  const [clientData, setClientData] = useState(null);
-  const [errors, setErrors] = useState({});
+ const [telefone, setTelefone] = useState('');
+ const [nome, setNome] = useState('');
+ const [endereco, setEndereco] = useState('');
+ const [clientData, setClientData] = useState(null);
 
-  const navigate = useNavigate();
+ const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadClientData = async () => {
-      if (!telefone) {
-        setNome('');
-        setEndereco('');
-        setClientData(null);
-        return;
-      }
+ useEffect(() => {
+   const loadClientData = async () => {
+     if (!telefone) {
+       setNome('');
+       setEndereco('');
+       setClientData(null);
+       return;
+     }
 
-      const docRef = doc(db, 'clientes', telefone);
-      const docSnap = await getDoc(docRef);
+     const docRef = doc(db, 'clientes', telefone);
+     const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setNome(data.nome);
-        setEndereco(data.endereco || '');
-        setClientData(data);
-      } else {
-        setNome('');
-        setEndereco('');
-        setClientData(null);
-      }
-    };
+     if (docSnap.exists()) {
+       const data = docSnap.data();
+       setNome(data.nome);
+       setEndereco(data.endereco || '');
+       setClientData(data);
+     } else {
+       setNome('');
+       setEndereco('');
+       setClientData(null);
+     }
+   };
 
-    loadClientData();
-  }, [telefone]);
+   loadClientData();
+ }, [telefone]);
 
-  const validateForm = () => {
-    const newErrors = {};
+ const validateForm = () => {
+   if (!telefone) {
+     alert('Digite o telefone');
+     return false;
+   } else if (telefone.length < 8) {
+     alert('Telefone inválido');
+     return false;
+   }
 
-    if (!telefone) {
-      newErrors.telefone = 'Digite o telefone';
-    } else if (telefone.length < 8) {
-      newErrors.telefone = 'Telefone inválido';
-    }
+   if (!nome.trim()) {
+     alert('Digite o nome do cliente');
+     return false;
+   }
 
-    setErrors(newErrors);
+   return true;
+ };
 
-    // Validação do nome com alert
-    if (!nome.trim()) {
-      alert('Digite o nome do cliente');
-      return false;
-    }
+ const handleSubmit = async (e) => {
+   e.preventDefault();
 
-    return Object.keys(newErrors).length === 0;
-  };
+   if (!validateForm()) {
+     return;
+   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+   const clientRef = doc(db, 'clientes', telefone);
+   if (clientData) {
+     await setDoc(clientRef, {
+       nome,
+       telefone,
+       endereco,
+     }, { merge: true });
+     console.log("Dados atualizados no banco!");
+   } else {
+     await setDoc(clientRef, {
+       nome,
+       telefone,
+       endereco,
+     });
+     console.log("Cliente adicionado no banco!");
+   }
 
-    if (!validateForm()) {
-      return;
-    }
+   navigate(`/bike-selection/${telefone}`);
+ };
 
-    const clientRef = doc(db, 'clientes', telefone);
-    if (clientData) {
-      await setDoc(clientRef, {
-        nome,
-        telefone,
-        endereco,
-      }, { merge: true });
-      console.log("Dados atualizados no banco!");
-    } else {
-      await setDoc(clientRef, {
-        nome,
-        telefone,
-        endereco,
-      });
-      console.log("Cliente adicionado no banco!");
-    }
+ const handleBack = () => {
+   navigate('/');
+ };
 
-    navigate(`/bike-selection/${telefone}`);
-  };
+ const handlePhoneChange = (e) => {
+   const value = e.target.value.replace(/[^0-9]/g, '');
+   if (value.length <= 12) {
+     setTelefone(value);
+   }
+ };
 
-  const handleBack = () => {
-    navigate('/');
-  };
+ const handleNameChange = (e) => {
+   const value = e.target.value;
+   if (value.length <= 30) {
+     setNome(value);
+   }
+ };
 
-  const handlePhoneChange = (e) => {
-    const value = e.target.value.replace(/[^0-9]/g, '');
-    if (value.length <= 12) {
-      setTelefone(value);
-    }
-  };
+ return (
+   <div className="identificacao-container">
+     {telefone && clientData ? (
+       <p>Cliente encontrado</p>
+     ) : telefone ? (
+       <p>Cliente não encontrado, preencha os dados abaixo</p>
+     ) : null}
 
-  const handleNameChange = (e) => {
-    const value = e.target.value;
-    if (value.length <= 30) {
-      setNome(value);
-    }
-  };
+     <div className="input-group">
+       <input
+         type="text"
+         placeholder="Telefone *"
+         value={telefone}
+         onChange={handlePhoneChange}
+         maxLength="12"
+       />
+     </div>
 
-  return (
-    <div className="identificacao-container">
-      {telefone && clientData ? (
-        <p>Cliente encontrado</p>
-      ) : telefone ? (
-        <p>Cliente não encontrado, preencha os dados abaixo</p>
-      ) : null}
+     {clientData ? (
+       <>
+         <div className="input-group">
+           <input
+             type="text"
+             placeholder="Nome *"
+             value={nome}
+             onChange={handleNameChange}
+             maxLength="30"
+           />
+         </div>
+         <div className="input-group">
+           <input
+             type="text"
+             placeholder="Endereço (opcional)"
+             value={endereco}
+             onChange={(e) => setEndereco(e.target.value)}
+           />
+         </div>
+       </>
+     ) : (
+       telefone && (
+         <>
+           <div className="input-group">
+             <input
+               type="text"
+               placeholder="Nome *"
+               value={nome}
+               onChange={handleNameChange}
+               maxLength="30"
+             />
+           </div>
+           <div className="input-group">
+             <input
+               type="text"
+               placeholder="Endereço (opcional)"
+               value={endereco}
+               onChange={(e) => setEndereco(e.target.value)}
+             />
+           </div>
+         </>
+       )
+     )}
 
-      <div className="input-group">
-        <input
-          type="text"
-          placeholder="Telefone *"
-          value={telefone}
-          onChange={handlePhoneChange}
-          maxLength="12"
-        />
-        {errors.telefone && <span className="error-message">{errors.telefone}</span>}
-      </div>
-
-      {clientData ? (
-        <>
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Nome *"
-              value={nome}
-              onChange={handleNameChange}
-              maxLength="30"
-            />
-          </div>
-          <div className="input-group">
-            <input
-              type="text"
-              placeholder="Endereço (opcional)"
-              value={endereco}
-              onChange={(e) => setEndereco(e.target.value)}
-            />
-          </div>
-        </>
-      ) : (
-        telefone && (
-          <>
-            <div className="input-group">
-              <input
-                type="text"
-                placeholder="Nome *"
-                value={nome}
-                onChange={handleNameChange}
-                maxLength="30"
-              />
-            </div>
-            <div className="input-group">
-              <input
-                type="text"
-                placeholder="Endereço (opcional)"
-                value={endereco}
-                onChange={(e) => setEndereco(e.target.value)}
-              />
-            </div>
-          </>
-        )
-      )}
-
-      <div className="btn-container">
-        <button className="btn" onClick={handleBack}>
-          Voltar
-        </button>
-        <button className="btn" onClick={handleSubmit}>
-          Continuar
-        </button>
-      </div>
-    </div>
-  );
+     <div className="btn-container">
+       <button className="btn" onClick={handleBack}>
+         Voltar
+       </button>
+       <button className="btn" onClick={handleSubmit}>
+         Continuar
+       </button>
+     </div>
+   </div>
+ );
 };
 
 export default Identificacao;

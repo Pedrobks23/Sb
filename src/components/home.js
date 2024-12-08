@@ -1,21 +1,33 @@
-// src/components/Home.js
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Atualizado para usar useNavigate no React Router v6
-import '../styles/home.css'; // Estilos da home
-import '../styles/shared.css'; // Estilo para a tela de seleção e cadastro de bikes
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../styles/home.css';
+import '../styles/shared.css';
 
 const Home = () => {
-  const navigate = useNavigate(); // Hook para navegação no React Router v6
+  const navigate = useNavigate();
+  const [imageError, setImageError] = useState(false);
 
-  // Função para navegar até a tela de Identificação
   const goToIdentificacao = () => {
-    navigate('/identificacao'); // Redireciona para a tela de Identificação
+    navigate('/identificacao');
+  };
+
+  const handleImageError = () => {
+    console.error('Erro ao carregar a imagem');
+    setImageError(true);
   };
 
   return (
     <div className="home-container">
-      <img src="Logo.png" alt="Logo" className="logo" /> {/* Logo do aplicativo */}
-      <button className="btn-yellow" onClick={goToIdentificacao}>
+      <img 
+        src={imageError ? 'Logo.png' : '/Logo.png'} // Tenta caminhos alternativos
+        alt="Logo" 
+        className="logo"
+        onError={handleImageError}
+      />
+      <button 
+        className="btn-yellow" 
+        onClick={goToIdentificacao}
+      >
         Toque aqui
       </button>
     </div>

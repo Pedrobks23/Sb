@@ -48,7 +48,6 @@ const OrdemServico = () => {
     if (validateDate(newDate)) {
       setSelectedDate(newDate);
     } else {
-      alert('Selecione uma data futura');
       const today = new Date().toISOString().split('T')[0];
       setSelectedDate(today);
       e.target.value = today;
@@ -243,7 +242,20 @@ const OrdemServico = () => {
   };
 
   const handleBack = () => {
-    navigate(`/servicos/${telefone}${location.search}`);
+    // Na tela OrdemServico
+    const searchParams = new URLSearchParams(location.search);
+    const bikesParam = searchParams.get('bikes');
+    
+    if (bikesParam) {
+      const selectedBikesIds = selectedBikes.map(bike => bike.id);
+      const queryParams = new URLSearchParams({
+        selectedBikes: JSON.stringify(selectedBikesIds)
+      }).toString();
+      
+      navigate(`/servicos/${telefone}?${queryParams}`);
+    } else {
+      navigate(`/servicos/${telefone}`);
+    }
   };
 
   if (loading) {
