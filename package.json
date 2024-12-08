@@ -1,6 +1,10 @@
 {
   "name": "sb",
-  "version": "0.1.0-beta",
+  "version": "0.1.0",
+  "main": "electron/main.js",  
+  "private": true,
+  "description": "Sistema de Gerenciamento Sport & Bike",
+  "version": "0.1.0",
   "main": "./electron/main.js",
   "homepage": "./",
   "description": "Sistema de Gestão Sport & Bike - Versão Beta",
@@ -102,3 +106,4 @@
     "wait-on": "^7.2.0"
   }
  }
+
