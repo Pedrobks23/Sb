@@ -14,6 +14,8 @@ const Confirmacao = () => {
   const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const CONSULTA_URL = 'https://sport-bike-web.vercel.app/';
+
   useEffect(() => {
     const loadOrderData = async () => {
       try {
@@ -49,36 +51,36 @@ const Confirmacao = () => {
         format: 'a4',
         unit: 'mm'
       });
-
+  
       const addVia = async (startY) => {
         // Logo
         const logoWidth = 25;
         const logoHeight = 25;
         pdf.addImage('/Logo.png', 'PNG', 10, startY, logoWidth, logoHeight);
-
+  
         // Cabeçalho
-        pdf.setFontSize(16);
+        pdf.setFontSize(20); // Increased from 16
         pdf.setFont("helvetica", "bold");
         pdf.text("ORDEM DE SERVIÇO", 105, startY + 15, { align: "center" });
         
         // Informações da empresa
-        pdf.setFontSize(8);
+        pdf.setFontSize(10); // Increased from 8
         pdf.setFont("helvetica", "normal");
         pdf.text("Rua Ana Bilhar, 1680 - Varjota, Fortaleza - CE", 105, startY + 22, { align: "center" });
         pdf.text("Tel: (85) 3267-7425 | (85) 3122-5874 | WhatsApp: (85) 3267-7425", 105, startY + 26, { align: "center" });
         pdf.text("@sportbike_fortaleza | comercialsportbike@gmail.com", 105, startY + 30, { align: "center" });
-
+  
         // Número da OS e Datas
-        pdf.setFontSize(12);
+        pdf.setFontSize(14); // Increased from 12
         pdf.setFont("helvetica", "bold");
         const numeroY = startY + 38;
         pdf.text(`OS: ${orderData.codigo}`, 10, numeroY);
         pdf.setFont("helvetica", "normal");
         pdf.text(`Criada em: ${new Date(orderData.dataCriacao).toLocaleDateString()}`, 10, numeroY + 5);
         pdf.text(`Agendada para: ${new Date(orderData.dataAgendamento).toLocaleDateString()}`, 10, numeroY + 10);
-
+  
         // Dados do Cliente
-        pdf.setFontSize(10);
+        pdf.setFontSize(12); // Increased from 10
         pdf.setFont("helvetica", "bold");
         const clienteY = numeroY + 20;
         pdf.text("DADOS DO CLIENTE", 10, clienteY);
@@ -88,22 +90,23 @@ const Confirmacao = () => {
         if (orderData.cliente.endereco) {
           pdf.text(`Endereço: ${orderData.cliente.endereco}`, 10, clienteY + 15);
         }
-
+  
         // Bicicletas e Serviços
         let currentY = clienteY + (orderData.cliente.endereco ? 25 : 20);
-
+  
         orderData.bicicletas.forEach((bike, index) => {
+          pdf.setFontSize(12); // Increased from default
           pdf.setFont("helvetica", "bold");
           pdf.text(`BICICLETA ${index + 1}: ${bike.marca} - ${bike.modelo} - ${bike.cor}`, 10, currentY);
           currentY += 5;
-
+  
           // Cabeçalho da tabela
-          pdf.setFontSize(8);
+          pdf.setFontSize(11); // Increased from 8
           pdf.text("Serviço", 10, currentY + 3);
           pdf.text("Qtd", 100, currentY + 3);
           pdf.text("Valor", 120, currentY + 3);
           currentY += 5;
-
+  
           // Linhas da tabela
           pdf.setFont("helvetica", "normal");
           Object.entries(bike.services)
@@ -113,58 +116,58 @@ const Confirmacao = () => {
               pdf.text(`${quantity}`, 102, currentY + 3);
               const valor = bike.total / Object.values(bike.services).filter(q => q > 0).length;
               pdf.text(`R$ ${valor.toFixed(2)}`, 120, currentY + 3);
-              currentY += 4;
+              currentY += 5; // Increased spacing between lines
             });
-
+  
           if (bike.observacoes) {
             currentY += 2;
             pdf.setFont("helvetica", "italic");
             pdf.text(`Obs: ${bike.observacoes}`, 10, currentY + 3);
             currentY += 4;
           }
-
+  
           pdf.setFont("helvetica", "bold");
           pdf.text(`Total: R$ ${bike.total.toFixed(2)}`, 120, currentY + 3);
           currentY += 8;
         });
 
-        // Total Geral
-        pdf.setFontSize(12);
-        pdf.setFont("helvetica", "bold");
-        pdf.text(`TOTAL GERAL: R$ ${orderData.valorTotal.toFixed(2)}`, 105, currentY + 3, { align: "right" });
-        
-        // Informações Adicionais
-        currentY += 10;
-        pdf.setFontSize(8);
-        pdf.setFont("helvetica", "normal");
-        pdf.text("• O prazo para conclusão do serviço pode ser estendido em até 2 dias após a data agendada.", 10, currentY);
-        currentY += 4;
-        pdf.text("• Caso a bicicleta ou peças não sejam retiradas no prazo de 180 dias após o término", 10, currentY);
-        currentY += 4;
-        pdf.text("  do serviço, serão vendidas para custear as despesas.", 10, currentY);
-
-        // QR Code
-        try {
+         // QR Code
+         try {
           const qrCodeElement = document.getElementById('qr-code');
           if (qrCodeElement) {
             const canvas = await html2canvas(qrCodeElement);
             const qrCodeImage = canvas.toDataURL('image/png');
-            pdf.addImage(qrCodeImage, 'PNG', 140, currentY - 25, 25, 25);
+            pdf.addImage(qrCodeImage, 'PNG', 140, currentY - 50, 30, 30);
           }
         } catch (error) {
           console.error('Erro ao gerar QR Code:', error);
         }
+        
+        // Total Geral
+        pdf.setFontSize(14); // Increased from 12
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`TOTAL GERAL: R$ ${orderData.valorTotal.toFixed(2)}`, 105, currentY + 3, { align: "right" });
+
+         // Informações Adicionais
+         currentY += 10;
+         pdf.setFontSize(10); // Increased from 8
+         pdf.setFont("helvetica", "normal");
+         pdf.text("• O prazo para conclusão do serviço pode ser estendido em até 2 dias após a data agendada.", 10, currentY);
+         currentY += 4;
+         pdf.text("• Caso a bicicleta ou peças não sejam retiradas no prazo de 180 dias após o término", 10, currentY);
+         currentY += 4;
+         pdf.text("  do serviço, serão vendidas para custear as despesas.", 10, currentY);
 
         // Linha divisória entre as vias
         pdf.setDrawColor(200);
         pdf.line(0, 148.5, 210, 148.5);
       };
-
+  
       await addVia(10);
       await addVia(158.5);
-
+  
       pdf.save(`OS-${orderData.codigo}.pdf`);
-
+  
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       alert('Erro ao gerar PDF. Tente novamente.');
@@ -202,7 +205,7 @@ const Confirmacao = () => {
     return <div className="error-message">Dados da ordem de serviço não encontrados</div>;
   }
 
-  return (
+ return (
     <div className="confirmacao-container">
       <div className="confirmacao-content">
         <h1>Ordem de Serviço Finalizada!</h1>
@@ -210,7 +213,7 @@ const Confirmacao = () => {
         <p className="instructions">
           Use o código abaixo para acompanhar o status do seu pedido.
         </p>
-        <p className="site-url">No site: https://sportbike.my.canva.site/sport-bike-fortaleza</p>
+        <p className="site-url">No site: {CONSULTA_URL}</p>
 
         <div className="codigo-box">
           <p>Código da Ordem de Serviço:</p>
@@ -233,7 +236,7 @@ const Confirmacao = () => {
         <div className="qr-code-container">
           <div id="qr-code" className="qr-code">
             <QRCodeSVG 
-              value={orderData.urlOS} 
+              value={CONSULTA_URL} 
               size={200} 
               level="H"
               includeMargin={true}

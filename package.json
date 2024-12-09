@@ -4,13 +4,10 @@
   "main": "electron/main.js",  
   "private": true,
   "description": "Sistema de Gerenciamento Sport & Bike",
-  "version": "0.1.0",
-  "main": "./electron/main.js",
   "homepage": "./",
-  "description": "Sistema de Gestão Sport & Bike - Versão Beta",
   "author": {
     "name": "Sport & Bike",
-    "email": "seu-email@exemplo.com"
+    "email": "pedrobikes2319@gmail.com"
   },
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
