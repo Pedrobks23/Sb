@@ -177,7 +177,7 @@ const OrdemServico = () => {
       const sequencial = (ultimaOrdem?.sequencial || 0) + 1;
       
       const codigoOS = `OS-${ano}${mes}${sequencial.toString().padStart(3, '0')}`;
-      const urlOS = `https://sportbike.my.canva.site/ordens/${codigoOS}`;
+      const urlOS = `${window.location.origin}/consulta?os=${codigoOS}`;
 
       const novaOrdem = {
         codigo: codigoOS,

@@ -185,6 +185,33 @@ const Servicos = () => {
     }
   };
 
+  const getOrderedServices = (availableServices) => {
+    if (!availableServices) return [];
+  
+    // Cria um array de serviços com seus valores
+    const servicesArray = Object.entries(availableServices)
+      .filter(([service]) => service !== "id")
+      .sort((a, b) => {
+        // Pega o índice de cada serviço no SERVICE_ORDER
+        const indexA = SERVICE_ORDER.indexOf(a[0]);
+        const indexB = SERVICE_ORDER.indexOf(b[0]);
+        
+        // Se ambos estão no SERVICE_ORDER, ordena por índice
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+        
+        // Se apenas um está no SERVICE_ORDER, ele vem primeiro
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+        
+        // Se nenhum está no SERVICE_ORDER, ordena alfabeticamente
+        return a[0].localeCompare(b[0]);
+      });
+  
+    return servicesArray;
+  };
+
   // Função para atualizar as observações
   const handleObservacoesChange = async (e) => {
     const newObservacoes = e.target.value;
@@ -275,48 +302,45 @@ const Servicos = () => {
   
           <div className="servicos-lista">
             <h2>Serviços Disponíveis</h2>
-            {availableServices && Object.entries(availableServices).map(([service, value], index) => {
-              if (service !== "id") {
-                const isMultipleService = MULTIPLE_SERVICES.includes(service);
-                const quantity = selectedServices[service] || 0;
+            {availableServices && getOrderedServices(availableServices).map(([service, value], index) => {
+              const isMultipleService = MULTIPLE_SERVICES.includes(service);
+              const quantity = selectedServices[service] || 0;
   
-                return (
-                  <div key={index} className="service-item">
-                    <div className="service-info">
-                      <input
-                        type="checkbox"
-                        id={service}
-                        checked={quantity > 0}
-                        onChange={(e) => handleServiceChange(service, e.target.checked ? 1 : 0)}
-                        disabled={!selectedBike}
-                      />
-                      <label htmlFor={service}>
-                        {service} - R$ {value.toFixed(2)}
-                      </label>
-                    </div>
-                    {isMultipleService && (
-                      <div className="quantity-controls">
-                        <button 
-                          className="quantity-button"
-                          onClick={() => handleServiceChange(service, Math.max(0, quantity - 1))}
-                          disabled={!selectedBike || quantity === 0}
-                        >
-                          -
-                        </button>
-                        <span className="quantity-display">{quantity}</span>
-                        <button 
-                          className="quantity-button"
-                          onClick={() => handleServiceChange(service, quantity + 1)}
-                          disabled={!selectedBike}
-                        >
-                          +
-                        </button>
-                      </div>
-                    )}
+              return (
+                <div key={index} className="service-item">
+                  <div className="service-info">
+                    <input
+                      type="checkbox"
+                      id={service}
+                      checked={quantity > 0}
+                      onChange={(e) => handleServiceChange(service, e.target.checked ? 1 : 0)}
+                      disabled={!selectedBike}
+                    />
+                    <label htmlFor={service}>
+                      {service} - R$ {value.toFixed(2)}
+                    </label>
                   </div>
-                );
-              }
-              return null;
+                  {isMultipleService && (
+                    <div className="quantity-controls">
+                      <button 
+                        className="quantity-button"
+                        onClick={() => handleServiceChange(service, Math.max(0, quantity - 1))}
+                        disabled={!selectedBike || quantity === 0}
+                      >
+                        -
+                      </button>
+                      <span className="quantity-display">{quantity}</span>
+                      <button 
+                        className="quantity-button"
+                        onClick={() => handleServiceChange(service, quantity + 1)}
+                        disabled={!selectedBike}
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
             })}
           </div>
   
