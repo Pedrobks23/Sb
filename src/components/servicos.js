@@ -157,26 +157,32 @@ const Servicos = () => {
 
   // Função para atualizar os serviços selecionados
   const handleServiceChange = async (serviceId, isChecked) => {
+    const quantity = isChecked ? 1 : 0;
     const newSelectedServices = {
       ...selectedServices,
-      [serviceId]: isChecked,
+      [serviceId]: quantity
     };
-
+  
     setSelectedServices(newSelectedServices);
-
+  
     if (selectedBike) {
       try {
+        // Calcular o total aqui antes de salvar
+        const total = calculateTotal(newSelectedServices);
+        
         const bikeServiceRef = doc(db, 'clientes', telefone, 'bikes', selectedBike);
         await setDoc(bikeServiceRef, {
           services: newSelectedServices,
-          observacoes
+          observacoes,
+          total: total // Salvando o total calculado
         }, { merge: true });
-
+  
         setSavedBikesServices(prev => ({
           ...prev,
           [selectedBike]: {
             services: newSelectedServices,
-            observacoes
+            observacoes,
+            total: total // Atualizando o total no estado
           }
         }));
       } catch (error) {

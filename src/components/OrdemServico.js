@@ -202,7 +202,7 @@ const OrdemServico = () => {
           observacoes: bike.observacoes || '',
           total: bike.total || 0
         })),
-        valorTotal: totalGeral,
+        valorTotal: totalGeral, // Aqui está o total
         termoBusca: `${clienteData.nome} ${telefone} ${codigoOS}`.toLowerCase(),
         totalBikes: selectedBikes.length
       };
