@@ -199,10 +199,27 @@ const OrdemServico = () => {
           modelo: bike.modelo,
           cor: bike.cor,
           services: bike.services || {},
+          serviceValues: Object.entries(bike.services || {}).reduce((acc, [serviceName, quantity]) => {
+            const valor = availableServices[serviceName] || 0;
+            acc[serviceName] = {
+              valor: valor,
+              valorFinal: valor,
+              quantidade: quantity
+            };
+            return acc;
+          }, {}),
           observacoes: bike.observacoes || '',
-          total: bike.total || 0
+          total: Object.entries(bike.services || {}).reduce((total, [serviceName, quantity]) => {
+            const valor = availableServices[serviceName] || 0;
+            return total + (valor * quantity);
+          }, 0)
         })),
-        valorTotal: totalGeral, // Aqui está o total
+        valorTotal: Object.values(selectedBikes).reduce((total, bike) => {
+          return total + Object.entries(bike.services || {}).reduce((bikeTotal, [serviceName, quantity]) => {
+            const valor = availableServices[serviceName] || 0;
+            return bikeTotal + (valor * quantity);
+          }, 0);
+        }, 0),
         termoBusca: `${clienteData.nome} ${telefone} ${codigoOS}`.toLowerCase(),
         totalBikes: selectedBikes.length
       };
