@@ -13,32 +13,30 @@ const Identificacao = () => {
 
  const navigate = useNavigate();
 
- useEffect(() => {
-   const loadClientData = async () => {
-     if (!telefone) {
-       setNome('');
-       setEndereco('');
-       setClientData(null);
-       return;
-     }
+useEffect(() => {
+  const loadClientData = async () => {
+    // clear any previous info while searching to avoid showing other clients
+    setNome('');
+    setEndereco('');
+    setClientData(null);
 
-     const docRef = doc(db, 'clientes', telefone);
-     const docSnap = await getDoc(docRef);
+    if (telefone.length < 8) {
+      return;
+    }
 
-     if (docSnap.exists()) {
-       const data = docSnap.data();
-       setNome(data.nome);
-       setEndereco(data.endereco || '');
-       setClientData(data);
-     } else {
-       setNome('');
-       setEndereco('');
-       setClientData(null);
-     }
-   };
+    const docRef = doc(db, 'clientes', telefone);
+    const docSnap = await getDoc(docRef);
 
-   loadClientData();
- }, [telefone]);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setNome(data.nome);
+      setEndereco(data.endereco || '');
+      setClientData(data);
+    }
+  };
+
+  loadClientData();
+}, [telefone]);
 
  const validateForm = () => {
    if (!telefone) {
@@ -169,14 +167,14 @@ const Identificacao = () => {
        )
      )}
 
-     <div className="btn-container">
-       <button className="btn" onClick={handleBack}>
-         Voltar
-       </button>
-       <button className="btn" onClick={handleSubmit}>
-         Continuar
-       </button>
-     </div>
+    <div className="btn-container">
+      <button className="btn" onClick={handleSubmit}>
+        Continuar
+      </button>
+      <button className="btn" onClick={handleBack}>
+        Voltar
+      </button>
+    </div>
    </div>
  );
 };
