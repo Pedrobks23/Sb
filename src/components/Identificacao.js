@@ -10,6 +10,7 @@ const Identificacao = () => {
  const [nome, setNome] = useState('');
  const [endereco, setEndereco] = useState('');
  const [clientData, setClientData] = useState(null);
+ const [errorMsg, setErrorMsg] = useState('');
 
  const navigate = useNavigate();
 
@@ -19,19 +20,24 @@ useEffect(() => {
     setNome('');
     setEndereco('');
     setClientData(null);
+    setErrorMsg('');
 
     if (telefone.length < 8) {
       return;
     }
 
     const docRef = doc(db, 'clientes', telefone);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setNome(data.nome);
-      setEndereco(data.endereco || '');
-      setClientData(data);
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setNome(data.nome);
+        setEndereco(data.endereco || '');
+        setClientData(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar cliente:', error);
+      setErrorMsg('Erro ao buscar dados, tente novamente');
     }
   };
 
@@ -108,16 +114,17 @@ useEffect(() => {
        <p>Cliente não encontrado, preencha os dados abaixo</p>
      ) : null}
 
-     <div className="input-group">
-        <input
-          type="text"
-          placeholder="Telefone *"
-          value={telefone}
-          onChange={handlePhoneChange}
-          maxLength="12"
-          autoComplete="off"
-        />
-     </div>
+    <div className="input-group">
+       <input
+         type="text"
+         placeholder="Telefone *"
+         value={telefone}
+         onChange={handlePhoneChange}
+         maxLength="12"
+         autoComplete="off"
+       />
+    </div>
+    {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
      {clientData ? (
        <>
