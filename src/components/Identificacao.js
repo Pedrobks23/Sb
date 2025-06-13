@@ -111,54 +111,59 @@ const Identificacao = () => {
      ) : null}
 
      <div className="input-group">
-       <input
-         type="text"
-         placeholder="Telefone *"
-         value={telefone}
-         onChange={handlePhoneChange}
-         maxLength="12"
-       />
+        <input
+          type="text"
+          placeholder="Telefone *"
+          value={telefone}
+          onChange={handlePhoneChange}
+          maxLength="12"
+          autoComplete="off"
+        />
      </div>
 
      {clientData ? (
        <>
          <div className="input-group">
-           <input
-             type="text"
-             placeholder="Nome *"
-             value={nome}
-             onChange={handleNameChange}
-             maxLength="30"
-           />
+          <input
+            type="text"
+            placeholder="Nome *"
+            value={nome}
+            onChange={handleNameChange}
+            maxLength="30"
+            autoComplete="off"
+          />
          </div>
          <div className="input-group">
-           <input
-             type="text"
-             placeholder="Endereço (opcional)"
-             value={endereco}
-             onChange={(e) => setEndereco(e.target.value)}
-           />
+          <input
+            type="text"
+            placeholder="Endereço (opcional)"
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+            autoComplete="off"
+          />
          </div>
        </>
      ) : (
        telefone && (
          <>
            <div className="input-group">
-             <input
-               type="text"
-               placeholder="Nome *"
-               value={nome}
-               onChange={handleNameChange}
-               maxLength="30"
-             />
+            <input
+              type="text"
+              placeholder="Nome *"
+              value={nome}
+              onChange={handleNameChange}
+              maxLength="30"
+              autoComplete="off"
+            />
            </div>
            <div className="input-group">
-             <input
-               type="text"
-               placeholder="Endereço (opcional)"
-               value={endereco}
-               onChange={(e) => setEndereco(e.target.value)}
-             />
+            <input
+              type="text"
+              placeholder="Endereço (opcional)"
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              autoComplete="off"
+            />
            </div>
          </>
        )
