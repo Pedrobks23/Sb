@@ -10,35 +10,39 @@ const Identificacao = () => {
  const [nome, setNome] = useState('');
  const [endereco, setEndereco] = useState('');
  const [clientData, setClientData] = useState(null);
+ const [errorMsg, setErrorMsg] = useState('');
 
  const navigate = useNavigate();
 
- useEffect(() => {
-   const loadClientData = async () => {
-     if (!telefone) {
-       setNome('');
-       setEndereco('');
-       setClientData(null);
-       return;
-     }
+useEffect(() => {
+  const loadClientData = async () => {
+    // clear any previous info while searching to avoid showing other clients
+    setNome('');
+    setEndereco('');
+    setClientData(null);
+    setErrorMsg('');
 
-     const docRef = doc(db, 'clientes', telefone);
-     const docSnap = await getDoc(docRef);
+    if (telefone.length < 8) {
+      return;
+    }
 
-     if (docSnap.exists()) {
-       const data = docSnap.data();
-       setNome(data.nome);
-       setEndereco(data.endereco || '');
-       setClientData(data);
-     } else {
-       setNome('');
-       setEndereco('');
-       setClientData(null);
-     }
-   };
+    const docRef = doc(db, 'clientes', telefone);
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setNome(data.nome);
+        setEndereco(data.endereco || '');
+        setClientData(data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar cliente:', error);
+      setErrorMsg('Erro ao buscar dados, tente novamente');
+    }
+  };
 
-   loadClientData();
- }, [telefone]);
+  loadClientData();
+}, [telefone]);
 
  const validateForm = () => {
    if (!telefone) {
@@ -110,68 +114,74 @@ const Identificacao = () => {
        <p>Cliente não encontrado, preencha os dados abaixo</p>
      ) : null}
 
-     <div className="input-group">
+    <div className="input-group">
        <input
          type="text"
          placeholder="Telefone *"
          value={telefone}
          onChange={handlePhoneChange}
          maxLength="12"
+         autoComplete="off"
        />
-     </div>
+    </div>
+    {errorMsg && <p className="error-msg">{errorMsg}</p>}
 
      {clientData ? (
        <>
          <div className="input-group">
-           <input
-             type="text"
-             placeholder="Nome *"
-             value={nome}
-             onChange={handleNameChange}
-             maxLength="30"
-           />
+          <input
+            type="text"
+            placeholder="Nome *"
+            value={nome}
+            onChange={handleNameChange}
+            maxLength="30"
+            autoComplete="off"
+          />
          </div>
          <div className="input-group">
-           <input
-             type="text"
-             placeholder="Endereço (opcional)"
-             value={endereco}
-             onChange={(e) => setEndereco(e.target.value)}
-           />
+          <input
+            type="text"
+            placeholder="Endereço (opcional)"
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+            autoComplete="off"
+          />
          </div>
        </>
      ) : (
        telefone && (
          <>
            <div className="input-group">
-             <input
-               type="text"
-               placeholder="Nome *"
-               value={nome}
-               onChange={handleNameChange}
-               maxLength="30"
-             />
+            <input
+              type="text"
+              placeholder="Nome *"
+              value={nome}
+              onChange={handleNameChange}
+              maxLength="30"
+              autoComplete="off"
+            />
            </div>
            <div className="input-group">
-             <input
-               type="text"
-               placeholder="Endereço (opcional)"
-               value={endereco}
-               onChange={(e) => setEndereco(e.target.value)}
-             />
+            <input
+              type="text"
+              placeholder="Endereço (opcional)"
+              value={endereco}
+              onChange={(e) => setEndereco(e.target.value)}
+              autoComplete="off"
+            />
            </div>
          </>
        )
      )}
 
-     <div className="btn-container">
-       <button className="btn" onClick={handleBack}>
-         Voltar
-       </button>
-       <button className="btn" onClick={handleSubmit}>
-         Continuar
-       </button>
-     </div>
+    <div className="btn-container">
+      <button className="btn" onClick={handleSubmit}>
+        Continuar
+      </button>
+      <button className="btn" onClick={handleBack}>
+        Voltar
+      </button>
+    </div>
    </div>
  );
 };

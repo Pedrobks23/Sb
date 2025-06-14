@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-window.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM carregado');
-=======
 const { contextBridge } = require('electron');
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +5,5 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // Aqui você pode expor funções para o renderer process
-  getDomReady: () => console.log('Electron API disponível')
->>>>>>> e1a70b1 (Falta só ajuste da logo após recarregar)
+  getDomReady: () => console.log('Electron API disponível'),
 });
